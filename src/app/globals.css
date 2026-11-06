@@ -1,26 +1,111 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #f2ede3;
+  --ink: #1c2620;
+  --muted: #5d665f;
+  --line: rgba(28, 38, 32, 0.14);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --font-serif: var(--font-serif-tc), "Noto Serif TC", serif;
+  --font-sans: var(--font-sans-tc), "Noto Sans TC", "Microsoft JhengHei", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+/* 細微的紙張雜訊質感 */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.15 0 0 0 0 0.12 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 亮面玻璃：細邊框 + 頂部高光 + 背景模糊 */
+.glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(28, 38, 32, 0.04),
+    0 24px 48px -24px rgba(28, 38, 32, 0.25);
+  /* 前綴版本要放前面，否則 CSS 壓縮時會把標準寫法刪掉 */
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+/* 抽獎 modal：背景模糊 + 彈出動畫 */
+.lucky-dialog::backdrop {
+  background: rgba(28, 38, 32, 0.35);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.lucky-dialog[open] {
+  animation: lucky-pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@keyframes lucky-pop {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lucky-dialog[open] {
+    animation: none;
+  }
+}
+
+/* 玩遊戲時先藏起抽獎按鈕 */
+body[data-playing] .lucky-fab {
+  display: none;
+}
+
+/* 歡迎詞淡入 */
+.welcome-in {
+  animation: welcome-in 0.6s ease-out both;
+}
+@keyframes welcome-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-in {
+    animation: none;
+  }
+}
+
+/* 放在照片上的玻璃：底色更實，確保文字讀得清楚 */
+.glass-strong {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.62));
+}
+
+/* 水果玻璃球：以顏色變數產生立體亮面 */
+.orb {
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.95) 0 6%, rgba(255, 255, 255, 0) 22%),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 40% 35%, var(--c1), var(--c2) 70%);
+  box-shadow:
+    inset -10px -16px 30px rgba(0, 0, 0, 0.18),
+    inset 8px 10px 20px rgba(255, 255, 255, 0.35),
+    0 30px 40px -20px var(--c2);
 }
